@@ -1,13 +1,13 @@
 # Paths
 # Fill this according to own setup
-BACKGROUND_DIR = 'demo_data_dir/backgrounds/'
+BACKGROUND_DIR = '~/Desktop/backgrounds_togen'
 BACKGROUND_GLOB_STRING = '*.png'
-POISSON_BLENDING_DIR = '/usr1/debidatd/pb'
-SELECTED_LIST_FILE = 'demo_data_dir/selected.txt'
-DISTRACTOR_LIST_FILE = 'demo_data_dir/neg_list.txt' 
-DISTRACTOR_DIR = 'demo_data_dir/distractor_objects_dir/'
-DISTRACTOR_GLOB_STRING = '*.jpg'
-INVERTED_MASK = True # Set to true if white pixels represent background
+POISSON_BLENDING_DIR = '~/Desktop/orlen/pb'
+#SELECTED_LIST_FILE = 'demo_data_dir/selected.txt'
+#DISTRACTOR_LIST_FILE = 'demo_data_dir/neg_list.txt'
+#DISTRACTOR_DIR = 'demo_data_dir/distractor_objects_dir/'
+DISTRACTOR_GLOB_STRING = '*.png'
+INVERTED_MASK = False # Set to true if white pixels represent background
 
 # Parameters for generator
 NUMBER_OF_WORKERS = 4

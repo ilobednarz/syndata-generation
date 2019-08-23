@@ -31,7 +31,7 @@ def randomAngle(kerneldim):
 
     Returns:
         int: Random angle
-    """ 
+    """
     kernelCenter = int(math.floor(kerneldim/2))
     numDistinctLines = kernelCenter * 4
     validLineAngles = np.linspace(0,180, numDistinctLines, endpoint = False)
@@ -39,7 +39,7 @@ def randomAngle(kerneldim):
     return int(validLineAngles[angleIdx])
 
 def LinearMotionBlur3C(img):
-    """Performs motion blur on an image with 3 channels. Used to simulate 
+    """Performs motion blur on an image with 3 channels. Used to simulate
        blurring caused due to motion of camera.
 
     Args:
@@ -51,19 +51,19 @@ def LinearMotionBlur3C(img):
     lineLengths = [3,5,7,9]
     lineTypes = ["right", "left", "full"]
     lineLengthIdx = np.random.randint(0, len(lineLengths))
-    lineTypeIdx = np.random.randint(0, len(lineTypes)) 
+    lineTypeIdx = np.random.randint(0, len(lineTypes))
     lineLength = lineLengths[lineLengthIdx]
     lineType = lineTypes[lineTypeIdx]
     lineAngle = randomAngle(lineLength)
     blurred_img = img
-    for i in xrange(3):
+    for i in range(3):
         blurred_img[:,:,i] = PIL2array1C(LinearMotionBlur(img[:,:,i], lineLength, lineAngle, lineType))
     blurred_img = Image.fromarray(blurred_img, 'RGB')
     return blurred_img
 
 def overlap(a, b):
-    '''Find if two bounding boxes are overlapping or not. This is determined by maximum allowed 
-       IOU between bounding boxes. If IOU is less than the max allowed IOU then bounding boxes 
+    '''Find if two bounding boxes are overlapping or not. This is determined by maximum allowed
+       IOU between bounding boxes. If IOU is less than the max allowed IOU then bounding boxes
        don't overlap
 
     Args:
@@ -74,15 +74,15 @@ def overlap(a, b):
     '''
     dx = min(a.xmax, b.xmax) - max(a.xmin, b.xmin)
     dy = min(a.ymax, b.ymax) - max(a.ymin, b.ymin)
-    
+
     if (dx>=0) and (dy>=0) and float(dx*dy) > MAX_ALLOWED_IOU*(a.xmax-a.xmin)*(a.ymax-a.ymin):
         return True
     else:
         return False
 
 def get_list_of_images(root_dir, N=1):
-    '''Gets the list of images of objects in the root directory. The expected format 
-       is root_dir/<object>/<image>.jpg. Adds an image as many times you want it to 
+    '''Gets the list of images of objects in the root directory. The expected format
+       is root_dir/<object>/<image>.jpg. Adds an image as many times you want it to
        appear in dataset.
 
     Args:
@@ -94,13 +94,13 @@ def get_list_of_images(root_dir, N=1):
     '''
     img_list = glob.glob(os.path.join(root_dir, '*/*.jpg'))
     img_list_f = []
-    for i in xrange(N):
+    for i in range(N):
         img_list_f = img_list_f + random.sample(img_list, len(img_list))
     return img_list_f
 
 def get_mask_file(img_file):
     '''Takes an image file name and returns the corresponding mask file. The mask represents
-       pixels that belong to the object. Default implentation assumes mask file has same path 
+       pixels that belong to the object. Default implentation assumes mask file has same path
        as image file with different extension only. Write custom code for getting mask file here
        if this is not the case.
 
@@ -117,7 +117,7 @@ def get_labels(imgs):
        structure. Directory name would be object name.
 
     Args:
-        imgs(list): List of images being used for synthesis 
+        imgs(list): List of images being used for synthesis
     Returns:
         list: List of labels/object names corresponding to each image
     '''
@@ -148,7 +148,7 @@ def get_annotation_from_mask_file(mask_file, scale=1.0):
         else:
             return -1, -1, -1, -1
     else:
-        print "%s not found. Using empty mask instead."%mask_file
+        print("%s not found. Using empty mask instead."%mask_file)
         return -1, -1, -1, -1
 
 def get_annotation_from_mask(mask):
@@ -179,7 +179,7 @@ def write_imageset_file(exp_dir, img_files, anno_files):
         anno_files(list): List of annotation files corresponding to each image file
     '''
     with open(os.path.join(exp_dir,'train.txt'),'w') as f:
-        for i in xrange(len(img_files)):
+        for i in range(len(img_files)):
             f.write('%s %s\n'%(img_files[i], anno_files[i]))
 
 def write_labels_file(exp_dir, labels):
@@ -196,7 +196,7 @@ def write_labels_file(exp_dir, labels):
             f.write('%s %s\n'%(i, label))
 
 def keep_selected_labels(img_files, labels):
-    '''Filters image files and labels to only retain those that are selected. Useful when one doesn't 
+    '''Filters image files and labels to only retain those that are selected. Useful when one doesn't
        want all objects to be used for synthesis
 
     Args:
@@ -210,7 +210,7 @@ def keep_selected_labels(img_files, labels):
         selected_labels = [x.strip() for x in f.readlines()]
     new_img_files = []
     new_labels = []
-    for i in xrange(len(img_files)):
+    for i in range(len(img_files)):
         if labels[i] in selected_labels:
             new_img_files.append(img_files[i])
             new_labels.append(labels[i])
@@ -251,7 +251,7 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
         distractor_objects(list): List of distractor objects that will be synthesized but whose annotations are not required
         img_file(str): Image file name
         anno_file(str): Annotation file name
-        bg_file(str): Background image path 
+        bg_file(str): Background image path
         w(int): Width of synthesized image
         h(int): Height of synthesized image
         scale_augment(bool): Add scale data augmentation
@@ -260,21 +260,21 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
         dontocclude(bool): Generate images with occlusion
     '''
     if 'none' not in img_file:
-        return 
-    
-    print "Working on %s" % img_file
+        return
+
+    print("Working on %s" % img_file)
     if os.path.exists(anno_file):
         return anno_file
-    
+
     all_objects = objects + distractor_objects
     while True:
         top = Element('annotation')
         background = Image.open(bg_file)
         background = background.resize((w, h), Image.ANTIALIAS)
         backgrounds = []
-        for i in xrange(len(blending_list)):
+        for i in range(len(blending_list)):
             backgrounds.append(background.copy())
-        
+
         if dontocclude:
             already_syn = []
         for idx, obj in enumerate(all_objects):
@@ -299,7 +299,7 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
                 foreground = foreground.resize((o_w, o_h), Image.ANTIALIAS)
                 mask = mask.resize((o_w, o_h), Image.ANTIALIAS)
            if rotation_augment:
-               max_degrees = MAX_DEGREES  
+               max_degrees = MAX_DEGREES
                while True:
                    rot_degrees = random.randint(-max_degrees, max_degrees)
                    foreground_tmp = foreground.rotate(rot_degrees, expand=True)
@@ -331,7 +331,7 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
                    break
            if dontocclude:
                already_syn.append([x+xmin, x+xmax, y+ymin, y+ymax])
-           for i in xrange(len(blending_list)):
+           for i in range(len(blending_list)):
                if blending_list[i] == 'none' or blending_list[i] == 'motion':
                    backgrounds[i].paste(foreground, (x, y), mask)
                elif blending_list[i] == 'poisson':
@@ -344,13 +344,13 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
                           img_target, img_src, offset=offset)
                   background_array = poisson_blend(img_mask, img_src, img_target,
                                     method='normal', offset_adj=offset_adj)
-                  backgrounds[i] = Image.fromarray(background_array, 'RGB') 
+                  backgrounds[i] = Image.fromarray(background_array, 'RGB')
                elif blending_list[i] == 'gaussian':
                   backgrounds[i].paste(foreground, (x, y), Image.fromarray(cv2.GaussianBlur(PIL2array1C(mask),(5,5),2)))
                elif blending_list[i] == 'box':
                   backgrounds[i].paste(foreground, (x, y), Image.fromarray(cv2.blur(PIL2array1C(mask),(3,3))))
            if idx >= len(objects):
-               continue 
+               continue
            object_root = SubElement(top, 'object')
            object_type = obj[1]
            object_type_entry = SubElement(object_root, 'name')
@@ -370,7 +370,7 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
            continue
         else:
            break
-    for i in xrange(len(blending_list)):
+    for i in range(len(blending_list)):
         if blending_list[i] == 'motion':
             backgrounds[i] = LinearMotionBlur3C(PIL2array3C(backgrounds[i]))
         backgrounds[i].save(img_file.replace('none', blending_list[i]))
@@ -378,7 +378,7 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
     xmlstr = xml.dom.minidom.parseString(tostring(top)).toprettyxml(indent="    ")
     with open(anno_file, "w") as f:
         f.write(xmlstr)
-   
+
 def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_augment, dontocclude, add_distractors):
     '''Creates list of objects and distrctor objects to be pasted on what images.
        Spawns worker processes and generates images according to given params
@@ -391,15 +391,15 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
         scale_augment(bool): Add scale data augmentation
         rotation_augment(bool): Add rotation data augmentation
         dontocclude(bool): Generate images with occlusion
-        add_distractors(bool): Add distractor objects whose annotations are not required 
+        add_distractors(bool): Add distractor objects whose annotations are not required
     '''
     w = WIDTH
     h = HEIGHT
     background_dir = BACKGROUND_DIR
     background_files = glob.glob(os.path.join(background_dir, BACKGROUND_GLOB_STRING))
-   
-    print "Number of background images : %s"%len(background_files) 
-    img_labels = zip(img_files, labels)
+
+    print("Number of background images : %s"%len(background_files))
+    img_labels = list(zip(img_files, labels))
     random.shuffle(img_labels)
 
     if add_distractors:
@@ -414,7 +414,7 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
         random.shuffle(distractor_files)
     else:
         distractor_files = []
-    print "List of distractor files collected: %s" % distractor_files
+    print("List of distractor files collected: %s" % distractor_files)
 
     idx = 0
     img_files = []
@@ -424,15 +424,15 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
         # Get list of objects
         objects = []
         n = min(random.randint(MIN_NO_OF_OBJECTS, MAX_NO_OF_OBJECTS), len(img_labels))
-        for i in xrange(n):
+        for i in range(n):
             objects.append(img_labels.pop())
-        # Get list of distractor objects 
+        # Get list of distractor objects
         distractor_objects = []
         if add_distractors:
             n = min(random.randint(MIN_NO_OF_DISTRACTOR_OBJECTS, MAX_NO_OF_DISTRACTOR_OBJECTS), len(distractor_files))
-            for i in xrange(n):
+            for i in range(n):
                 distractor_objects.append(random.choice(distractor_files))
-            print "Chosen distractor objects: %s" % distractor_objects
+            print("Chosen distractor objects: %s" % distractor_objects)
 
         idx += 1
         bg_file = random.choice(background_files)
@@ -444,12 +444,12 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
             img_files.append(img_file)
             anno_files.append(anno_file)
 
-    partial_func = partial(create_image_anno_wrapper, w=w, h=h, scale_augment=scale_augment, rotation_augment=rotation_augment, blending_list=BLENDING_LIST, dontocclude=dontocclude) 
+    partial_func = partial(create_image_anno_wrapper, w=w, h=h, scale_augment=scale_augment, rotation_augment=rotation_augment, blending_list=BLENDING_LIST, dontocclude=dontocclude)
     p = Pool(NUMBER_OF_WORKERS, init_worker)
     try:
         p.map(partial_func, params_list)
     except KeyboardInterrupt:
-        print "....\nCaught KeyboardInterrupt, terminating workers"
+        print("....\nCaught KeyboardInterrupt, terminating workers")
         p.terminate()
     else:
         p.close()
@@ -461,11 +461,11 @@ def init_worker():
     Catch Ctrl+C signal to termiante workers
     '''
     signal.signal(signal.SIGINT, signal.SIG_IGN)
- 
+
 def generate_synthetic_dataset(args):
     ''' Generate synthetic dataset according to given args
     '''
-    img_files = get_list_of_images(args.root, args.num) 
+    img_files = get_list_of_images(args.root, args.num)
     labels = get_labels(img_files)
 
     if args.selected:
@@ -473,7 +473,7 @@ def generate_synthetic_dataset(args):
 
     if not os.path.exists(args.exp):
         os.makedirs(args.exp)
-    
+
     write_labels_file(args.exp, labels)
 
     anno_dir = os.path.join(args.exp, 'annotations')
@@ -482,7 +482,7 @@ def generate_synthetic_dataset(args):
         os.makedirs(anno_dir)
     if not os.path.exists(os.path.join(img_dir)):
         os.makedirs(img_dir)
-    
+
     syn_img_files, anno_files = gen_syn_data(img_files, labels, img_dir, anno_dir, args.scale, args.rotation, args.dontocclude, args.add_distractors)
     write_imageset_file(args.exp, syn_img_files, anno_files)
 
