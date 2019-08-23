@@ -15,7 +15,7 @@ import signal
 import time
 
 from defaults import *
-sys.path.insert(0, POISSON_BLENDING_DIR)
+# sys.path.insert(0, POISSON_BLENDING_DIR)
 from pb import *
 import math
 from pyblur import *
@@ -396,6 +396,7 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
     w = WIDTH
     h = HEIGHT
     background_dir = BACKGROUND_DIR
+    print('Looking for backgounds in: ', os.path.join(background_dir, BACKGROUND_GLOB_STRING))
     background_files = glob.glob(os.path.join(background_dir, BACKGROUND_GLOB_STRING))
 
     print("Number of background images : %s"%len(background_files))
