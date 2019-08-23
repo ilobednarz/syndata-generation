@@ -92,10 +92,13 @@ def get_list_of_images(root_dir, N=1):
     Returns:
         list: List of images(with paths) that will be put in the dataset
     '''
-    img_list = glob.glob(os.path.join(root_dir, '*/*.jpg'))
+    images_glob_string = os.path.join(root_dir, IMAGES_GLOB_STRING)
+    print('Looking for images in: ', images_glob_string)
+    img_list = glob.glob(images_glob_string)
     img_list_f = []
     for i in range(N):
         img_list_f = img_list_f + random.sample(img_list, len(img_list))
+    print('Number of images: ', len(img_list_f))
     return img_list_f
 
 def get_mask_file(img_file):
@@ -235,8 +238,8 @@ def PIL2array3C(img):
     Returns:
         NumPy Array: Converted image
     '''
-    return np.array(img.getdata(),
-                    np.uint8).reshape(img.size[1], img.size[0], 3)
+    
+    return np.array(img)
 
 def create_image_anno_wrapper(args, w=WIDTH, h=HEIGHT, scale_augment=False, rotation_augment=False, blending_list=['none'], dontocclude=False):
    ''' Wrapper used to pass params to workers
@@ -259,14 +262,19 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
         blending_list(list): List of blending modes to synthesize for each image
         dontocclude(bool): Generate images with occlusion
     '''
-    if 'none' not in img_file:
-        return
+    print('image anno...')
+    print("img_file: ", img_file)
+    # if 'none' not in img_file:
+    #     return
 
     print("Working on %s" % img_file)
     if os.path.exists(anno_file):
         return anno_file
 
     all_objects = objects + distractor_objects
+
+    # print('All objects: ', all_objects)
+
     while True:
         top = Element('annotation')
         background = Image.open(bg_file)
@@ -277,7 +285,9 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
 
         if dontocclude:
             already_syn = []
+
         for idx, obj in enumerate(all_objects):
+           print('OBJ: ', obj)
            foreground = Image.open(obj[0])
            xmin, xmax, ymin, ymax = get_annotation_from_mask_file(get_mask_file(obj[0]))
            if xmin == -1 or ymin == -1 or xmax-xmin < MIN_WIDTH or ymax-ymin < MIN_HEIGHT :
@@ -400,18 +410,22 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
     background_files = glob.glob(os.path.join(background_dir, BACKGROUND_GLOB_STRING))
 
     print("Number of background images : %s"%len(background_files))
+
     img_labels = list(zip(img_files, labels))
+    # print(img_labels)
     random.shuffle(img_labels)
 
     if add_distractors:
         with open(DISTRACTOR_LIST_FILE) as f:
             distractor_labels = [x.strip() for x in f.readlines()]
 
+        print('Found distractors labels: ', distractor_labels)
+
         distractor_list = []
         for distractor_label in distractor_labels:
             distractor_list += glob.glob(os.path.join(DISTRACTOR_DIR, distractor_label, DISTRACTOR_GLOB_STRING))
-
-        distractor_files = zip(distractor_list, len(distractor_list)*[None])
+        print("distractor_list: ", distractor_list)
+        distractor_files = list(zip(distractor_list, len(distractor_list)*[None]))
         random.shuffle(distractor_files)
     else:
         distractor_files = []

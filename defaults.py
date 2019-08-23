@@ -2,10 +2,11 @@
 # Fill this according to own setup
 BACKGROUND_DIR = '/home/ilona/Desktop/backgrounds_togen'
 BACKGROUND_GLOB_STRING = '*.png'
-# POISSON_BLENDING_DIR = 
-#SELECTED_LIST_FILE = 'demo_data_dir/selected.txt'
-#DISTRACTOR_LIST_FILE = 'demo_data_dir/neg_list.txt'
-#DISTRACTOR_DIR = 'demo_data_dir/distractor_objects_dir/'
+IMAGES_GLOB_STRING = '*.png'
+# POISSON_BLENDING_DIR =
+# SELECTED_LIST_FILE = 'demo_data_dir/selected.txt'
+DISTRACTOR_LIST_FILE = '/home/ilona/Desktop/distr.txt'
+DISTRACTOR_DIR = '/home/ilona/Desktop/distractor_files'
 DISTRACTOR_GLOB_STRING = '*.png'
 INVERTED_MASK = False # Set to true if white pixels represent background
 
